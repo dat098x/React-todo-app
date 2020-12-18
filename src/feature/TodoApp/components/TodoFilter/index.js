@@ -1,26 +1,29 @@
-import React from 'react';
-import PropTypes from 'prop-types';
-import { Button } from 'reactstrap';
+import React from "react";
+import PropTypes from "prop-types";
+import { Button } from "reactstrap";
+import { useSelector } from "react-redux";
 
 TodoFilter.propTypes = {
-  value: PropTypes.string,
+  filter: PropTypes.string,
   onFilterClick: PropTypes.func,
 };
 
 TodoFilter.defaultProps = {
-  value: 'All',
+  filter: "SHOW_ALL",
   onFilterClick: null,
-}
+};
 
 function TodoFilter(props) {
-  const { onFilterClick, value } = props
+  const { onFilterClick, filter } = props;
+  const visibilityFilter = useSelector((state) => state.visibilityFilter);
+
   const handleFilterClick = () => {
-    if (onFilterClick) onFilterClick(value);
-  }
+    if (onFilterClick) onFilterClick(filter);
+  };
   return (
-    <Button
-      onClick={handleFilterClick}>
-      {value}</Button>
+    <Button onClick={handleFilterClick} disabled={filter === visibilityFilter}>
+      {filter}
+    </Button>
   );
 }
 

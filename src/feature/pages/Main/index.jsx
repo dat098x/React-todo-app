@@ -3,20 +3,37 @@ import TodoHeader from "feature/TodoApp/components/TodoHeader";
 import TodoList from "feature/TodoApp/components/TodoList";
 import {
   addTodo,
-  removeTodo,
   isCompletedTodo,
-  filterTodo,
+  removeTodo,
+  toggleTodo,
 } from "feature/TodoApp/todoSlice";
 import React from "react";
 import { useDispatch, useSelector } from "react-redux";
-
 import "./Main.scss";
+import {
+  setVisibilityFilter,
+  VisibilityFilters,
+} from "feature/TodoApp/filterSlice";
 
 MainPage.propTypes = {};
 
 function MainPage(props) {
   const dispatch = useDispatch();
   const todos = useSelector((state) => state.todos);
+  const filter = useSelector((state) => state.visibilityFilter);
+
+  const selectVisibleTodos = (todos, filter) => {
+    switch (filter) {
+      case VisibilityFilters.SHOW_ALL:
+        return todos;
+      case VisibilityFilters.SHOW_COMPLETED:
+        return todos.filter((t) => t.isCompleted);
+      case VisibilityFilters.SHOW_ACTIVE:
+        return todos.filter((t) => !t.isCompleted);
+      default:
+        throw new Error("Unknown filter: " + filter);
+    }
+  };
 
   const handleTodoSubmit = (todo) => {
     console.log("Submit-Todo", todo);
@@ -37,26 +54,33 @@ function MainPage(props) {
     dispatch(removeTodo(todo.id));
   };
 
+  const handleTodoCompletedAllClick = (isCompledAll) => {
+    console.log("CompletedAll-Todo");
+    dispatch(toggleTodo(isCompledAll));
+  };
+
   const handleCompletedCLick = (todo) => {
     console.log("Completed-Todo", todo);
     dispatch(isCompletedTodo(todo.id));
   };
 
-  const handleTodoFilterClick = (filter) => {
+  const handleFilterClick = (filter) => {
     console.log("Filter-Todo", filter);
-    dispatch(filterTodo(filter));
+    dispatch(setVisibilityFilter(filter));
   };
-
   return (
     <div className="todo-main">
-      <TodoHeader onSubmit={handleTodoSubmit} />
+      <TodoHeader
+        onSubmit={handleTodoSubmit}
+        onTodoCompletedAllClick={handleTodoCompletedAllClick}
+      />
       <TodoList
-        todoList={todos}
+        todoList={selectVisibleTodos(todos, filter)}
         onTodoEditClick={handleTodoEditClick}
         onTodoRemoveClick={handleTodoRemoveClick}
         onTodoCompletedClick={handleCompletedCLick}
       />
-      <TodoFooter onTodoFilterClick={handleTodoFilterClick} />
+      <TodoFooter onTodoFilterClick={handleFilterClick} />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 const { createSlice } = require("@reduxjs/toolkit");
 
-const initialTodo= [
+const initialTodo = [
   {
     id: 1,
     title: "Todo1",
@@ -18,43 +18,31 @@ const initialTodo= [
     title: "Todo3",
     description: "Todo3 ...",
     isCompleted: false,
-  }
-]
+  },
+];
 
 const todo = createSlice({
-  name: 'todos',
+  name: "todos",
   initialState: initialTodo,
   reducers: {
     addTodo: (state, action) => {
-      state.push(action.payload)
+      state.push(action.payload);
     },
     removeTodo: (state, action) => {
-      return state.filter(todo => todo.id !== action.payload);
+      return state.filter((todo) => todo.id !== action.payload);
     },
     isCompletedTodo: (state, action) => {
-      const index = state.findIndex(todo => todo.id === action.payload);
-      state[index].isCompleted = !state[index].isCompleted;
-    },
-    filterTodo: (state, action) => {
-      switch(action.payload) {
-        case "ACTIVE": {
-          const filterTodo = [...state];
-          filterTodo.filter(todo => !todo.isCompleted);
-          console.log([...state]);
-          return filterTodo.filter(todo => !todo.isCompleted);
-        }
-        case "COMPLETED": {
-          const filterTodo = [];
-          filterTodo.push(state.find(todo => todo.isCompleted === true));
-          return filterTodo;  
-        }
-        default:
-          return [...state];
+      const todo = state.find((todo) => todo.id === action.payload);
+      if (todo) {
+        todo.isCompleted = !todo.isCompleted;
       }
-    }
-  }
+    },
+    toggleTodo: (state, action) => {
+      return state.forEach((todo) => (todo.isCompleted = !action.payload));
+    },
+  },
 });
 
-const {reducer, actions} = todo;
-export const { addTodo, removeTodo, isCompletedTodo, filterTodo } = actions;
+const { reducer, actions } = todo;
+export const { addTodo, removeTodo, isCompletedTodo, toggleTodo } = actions;
 export default reducer;
